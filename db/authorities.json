@@ -1,0 +1,11 @@
+{
+  "authorities": [
+    {"id": "by-mo", "country_code": "BY", "name_ru": "Министерство образования РБ"},
+    {"id": "by-ms", "country_code": "BY", "name_ru": "Министерство здравоохранения РБ"},
+    {"id": "ru-minsvyaz", "country_code": "RU", "name_ru": "Минпросвещения России"},
+    {"id": "ru-fns", "country_code": "RU", "name_ru": "ФНС России"},
+    {"id": "kz-mon", "country_code": "KZ", "name_ru": "Министерство образования РК"},
+    {"id": "am-gov", "country_code": "AM", "name_ru": "Государственный орган Армении"},
+    {"id": "az-gov", "country_code": "AZ", "name_ru": "Государственный орган Азербайджана"}
+  ]
+}

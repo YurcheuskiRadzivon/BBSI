@@ -1,0 +1,7 @@
+{
+  "types": [
+    {"id": "diploma", "label_ru": "Диплом"},
+    {"id": "tax_record", "label_ru": "Налоговая справка"},
+    {"id": "certificate", "label_ru": "Сертификат квалификации"}
+  ]
+}

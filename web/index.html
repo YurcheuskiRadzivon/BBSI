@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BBSI — хэшчейн (DAG), файловая БД</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <div class="page">
+    <h1>BBSI</h1>
+    <p class="intro">Хэшчейн (DAG) для госдокументов (СНГ).</p>
+
+    <section class="panel dag-panel">
+      <h2>Хэш-граф (DAG)</h2>
+      <div class="dag-scroll">
+        <svg id="dag-svg" viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <p id="dag-meta" class="mt muted">0 узлов</p>
+      <div class="row mt">
+        <button type="button" id="btn-refresh">Обновить граф</button>
+        <button type="button" class="secondary" id="btn-seed">Демо (issue BY → RU)</button>
+      </div>
+    </section>
+
+    <div class="grid grid-main">
+      <section class="panel">
+        <h2>Выдача (issue)</h2>
+        <form id="form-issue">
+          <label>ID документа</label>
+          <input name="document_id" id="issue-document-id" required placeholder="DOC-001" />
+
+          <label>Тип документа</label>
+          <select name="document_type" id="issue-document-type"></select>
+
+          <div class="form-split">
+            <div>
+              <label>Страна-эмитент</label>
+              <select name="issuer_country" id="issue-issuer-country"></select>
+            </div>
+            <div>
+              <label>Орган власти</label>
+              <select name="issuer_authority" id="issue-authority"></select>
+            </div>
+          </div>
+
+          <label>Страна-получатель</label>
+          <select name="receiver_country" id="issue-receiver-country"></select>
+
+          <h3 class="form-section-title">Содержимое документа</h3>
+          <div class="form-grid">
+            <label>Название / степень <input id="issue-title" type="text" value="Диплом бакалавра" /></label>
+            <label>Год выпуска <input id="issue-year" type="number" value="2024" /></label>
+            <label>Учреждение <input id="issue-institution" type="text" value="БГУ" /></label>
+            <label>Специальность / программа <input id="issue-program" type="text" value="Прикладная информатика" /></label>
+            <label>Серия и номер <input id="issue-series" type="text" placeholder="АБ №1234567" /></label>
+          </div>
+
+          <h3 class="form-section-title">Персональные метаданные (GDPR: в реестр только хэш)</h3>
+          <div class="form-grid">
+            <label>Ссылка на субъекта (псевдоним / внутр. id) <input id="issue-holder-ref" type="text" value="holder-ref-demo-001" /></label>
+            <label>Год рождения <input id="issue-birth-year" type="number" value="1999" /></label>
+            <label class="full-width">Комментарий (без прямых ПДн) <input id="issue-personal-notes" type="text" placeholder="опционально" /></label>
+          </div>
+
+          <label>SHA-256 содержимого документа (авто)</label>
+          <div id="issue-doc-hash-out" class="hash-readonly"></div>
+          <label>SHA-256 метаданных (авто)</label>
+          <div id="issue-meta-hash-out" class="hash-readonly"></div>
+
+          <button type="submit">Подписать и добавить узел</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Проверка документа</h2>
+        <small class="hint">Запись в журнал <strong>не</strong> создаётся. По <code>document_id</code> в цепочке ищется последняя транзакция <strong>issue</strong> или <strong>revoke</strong>:
+          если последняя — отзыв, документ недействителен; если выпуск — сравниваются SHA-256 содержимого и метаданных с узлом выпуска.
+          Удобнее выбрать документ из реестра — подставятся те же JSON, что при выдаче.</small>
+        <form id="form-verify">
+          <label>Загрузить из реестра документов</label>
+          <select id="verify-doc-registry">
+            <option value="">— выберите документ —</option>
+          </select>
+          <small class="hint">Подставляет поля из <code>db/documents.json</code></small>
+
+          <label>ID документа</label>
+          <input name="document_id" id="verify-document-id" required />
+
+          <label>Тип (для справки)</label>
+          <select name="document_type" id="verify-document-type"></select>
+
+          <h3 class="form-section-title">Содержимое документа (как при выдаче)</h3>
+          <div class="form-grid">
+            <label>Название <input id="verify-title" type="text" /></label>
+            <label>Год <input id="verify-year" type="number" /></label>
+            <label>Учреждение <input id="verify-institution" type="text" /></label>
+            <label>Программа <input id="verify-program" type="text" /></label>
+            <label>Серия и номер <input id="verify-series" type="text" /></label>
+          </div>
+
+          <h3 class="form-section-title">Персональные метаданные</h3>
+          <div class="form-grid">
+            <label>Ссылка на субъекта <input id="verify-holder-ref" type="text" /></label>
+            <label>Год рождения <input id="verify-birth-year" type="number" /></label>
+            <label class="full-width">Комментарий <input id="verify-personal-notes" type="text" /></label>
+          </div>
+
+          <label>SHA-256 содержимого (авто)</label>
+          <div id="verify-doc-hash-out" class="hash-readonly"></div>
+          <label>SHA-256 метаданных (авто)</label>
+          <div id="verify-meta-hash-out" class="hash-readonly"></div>
+
+          <button type="submit">Проверить</button>
+        </form>
+        <div id="verify-result" class="validate-result mt" hidden aria-live="polite"></div>
+      </section>
+    </div>
+
+    <div class="grid mt">
+      <section class="panel">
+        <h2>Отзыв (revoke)</h2>
+        <small class="hint">Отзыв не удаляет узел выпуска из журнала — добавляется новая транзакция «отозван».
+          После отзыва в полной проверке документ отмечается как не действующий (код <code>document_revoked</code> в <code>warnings</code>; сама цепочка остаётся «успешной»).</small>
+        <form id="form-revoke">
+          <label>ID документа</label>
+          <input name="document_id" required />
+          <label>Эмитент оригинального issue</label>
+          <select name="issuer_country" id="revoke-issuer"></select>
+          <button type="submit">Отозвать</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Общие логи</h2>
+        <textarea id="ops-log" class="log-window" readonly></textarea>
+        <div class="row mt">
+          <button type="button" class="secondary" id="btn-validate">Проверить цепочку (/api/validate)</button>
+          <button type="button" class="ghost" id="btn-gossip">Gossip</button>
+        </div>
+        <small class="hint">Перед проверкой журнал подгружается заново из <code>db/nodes.json</code> — можно править файл без перезапуска сервера. Итог и запись в лог.</small>
+        <div id="validate-result" class="validate-result" hidden aria-live="polite"></div>
+      </section>
+    </div>
+
+    <section class="panel log-attack mt">
+      <h2>Лог атак</h2>
+      <textarea id="attack-log" class="log-window" readonly></textarea>
+
+      <div class="flex-wrap mt">
+        <div class="panel atk-box">
+          <strong>Атака 1 — подделка DocumentHash</strong>
+          <label>Узел выдачи (issue)</label>
+          <select id="sel-forge"><option value="">— нет узлов issue —</option></select>
+          <button type="button" class="danger" id="btn-attack-forge">Симуляция подделки хэша</button>
+        </div>
+        <div class="panel atk-box">
+          <strong>Атака 2 — подмена эмитента</strong>
+          <label>Узел</label>
+          <select id="sel-issuer"><option value="">— нет узлов —</option></select>
+          <label>Новая страна</label>
+          <input id="new-country" maxlength="8" placeholder="RU" />
+          <button type="button" class="danger" id="btn-attack-issuer">Симуляция подмены эмитента</button>
+        </div>
+        <div class="panel atk-box">
+          <strong>Атака 3 — незаконный revoke</strong>
+          <label>Документ</label>
+          <select id="illegal-doc"></select>
+          <label>Чужая страна</label>
+          <input id="wrong-country" maxlength="8" placeholder="KZ" />
+          <button type="button" class="danger" id="btn-attack-revoke">Симуляция чужого revoke</button>
+        </div>
+      </div>
+      <button type="button" class="ghost mt" id="btn-clear-attack-log">Очистить журнал атак</button>
+
+      <details class="attack-help mt">
+        <summary>Справка: атаки и симуляция</summary>
+        <div class="hint attack-help-body">
+          <p><strong>Общее.</strong> Атаки 1 и 2 выполняются только в памяти: подмена видна при проверке, затем узел <strong>восстанавливается</strong>, в <code>nodes.json</code> остаётся исходная цепочка.
+            Атака 3 не добавляет недопустимый узел — сервер отклоняет транзакцию.</p>
+          <p><strong>Атака 1 — подделка DocumentHash.</strong> Для выбранного <code>issue</code> временно меняется хэш содержимого без пересчёта <code>node_hash</code>. Ожидаются ошибки вроде <code>node_hash_mismatch</code>. После сценария данные узла откатываются.</p>
+          <p><strong>Атака 2 — подмена эмитента.</strong> В памяти меняется поле <code>IssuerCountry</code>, подпись ECDSA остаётся от старого ключа → <code>bad_signature</code>. Затем откат.</p>
+          <p><strong>Атака 3 — незаконный revoke.</strong> Отзыв разрешён только эмитенту первого <code>issue</code> этого <code>document_id</code>.
+            Запрос с «чужой страной» не записывается в граф (<code>AddRevoke</code>). Для уже записанных узлов тот же принцип даёт <code>illegal_revoke</code>.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="panel danger-reset-panel mt">
+      <h2>Сброс данных БД</h2>
+      <button type="button" class="danger" id="btn-reset-db">Очистить всё и начать заново</button>
+      <p id="reset-db-msg" class="mt muted" aria-live="polite"></p>
+    </section>
+
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+
+</html>

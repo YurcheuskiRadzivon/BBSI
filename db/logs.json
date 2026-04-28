@@ -1,0 +1,79 @@
+{
+  "entries": [
+    {
+      "time": 1777419255525,
+      "level": "info",
+      "message": "Gossip: добавлен узел b6b17f24f1db46cec9ad6d345498b9d6, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6]"
+    },
+    {
+      "time": 1777419255834,
+      "level": "info",
+      "message": "Gossip: добавлен узел 5ea33d6ac3411ef5a63857af1a594dc2, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2]"
+    },
+    {
+      "time": 1777419256151,
+      "level": "info",
+      "message": "Gossip: добавлен узел c167333728601de33f1aa5a1f60d5198, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198]"
+    },
+    {
+      "time": 1777419257772,
+      "level": "info",
+      "message": "Gossip: добавлен узел deb3e1b067f6c0d7f52532240704e192, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192]"
+    },
+    {
+      "time": 1777419259234,
+      "level": "info",
+      "message": "Gossip: добавлен узел d626ada670876a52163dd31dd77aeb41, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41]"
+    },
+    {
+      "time": 1777419259682,
+      "level": "info",
+      "message": "Gossip: добавлен узел 509f8b7dd217d36d2d2c8e33b6efdca9, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9]"
+    },
+    {
+      "time": 1777419259904,
+      "level": "info",
+      "message": "Gossip: добавлен узел df55412f4f8a720b6c544f2d2fbdfcb7, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7]"
+    },
+    {
+      "time": 1777419260081,
+      "level": "info",
+      "message": "Gossip: добавлен узел eaeccd961c9ad3dde86fef2a1da107fc, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc]"
+    },
+    {
+      "time": 1777419260267,
+      "level": "info",
+      "message": "Gossip: добавлен узел f03138026e77980e42a86aa56fa981e6, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6]"
+    },
+    {
+      "time": 1777419260450,
+      "level": "info",
+      "message": "Gossip: добавлен узел 376238a7c75a136ad52c50cbbf682ee9, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6 376238a7c75a136ad52c50cbbf682ee9]"
+    },
+    {
+      "time": 1777419260625,
+      "level": "info",
+      "message": "Gossip: добавлен узел e9e7f00d9a3e2c2beb9e674a06be304c, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6 376238a7c75a136ad52c50cbbf682ee9 e9e7f00d9a3e2c2beb9e674a06be304c]"
+    },
+    {
+      "time": 1777419260786,
+      "level": "info",
+      "message": "Gossip: добавлен узел cf9aa95ce06affb0c8e99b1c0bcdb8bd, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6 376238a7c75a136ad52c50cbbf682ee9 e9e7f00d9a3e2c2beb9e674a06be304c cf9aa95ce06affb0c8e99b1c0bcdb8bd]"
+    },
+    {
+      "time": 1777419260962,
+      "level": "info",
+      "message": "Gossip: добавлен узел 3768df9af78a0e38bae914e8cf4036c7, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6 376238a7c75a136ad52c50cbbf682ee9 e9e7f00d9a3e2c2beb9e674a06be304c cf9aa95ce06affb0c8e99b1c0bcdb8bd 3768df9af78a0e38bae914e8cf4036c7]"
+    },
+    {
+      "time": 1777419261142,
+      "level": "info",
+      "message": "Gossip: добавлен узел 933b9071e89cf69e04f0a00584b36137, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6 376238a7c75a136ad52c50cbbf682ee9 e9e7f00d9a3e2c2beb9e674a06be304c cf9aa95ce06affb0c8e99b1c0bcdb8bd 3768df9af78a0e38bae914e8cf4036c7 933b9071e89cf69e04f0a00584b36137]"
+    },
+    {
+      "time": 1777419275205,
+      "level": "info",
+      "message": "Gossip: добавлен узел b9849a09eaf7904b136a7e8fdcc826cc, виртуальный порядок: [b6b17f24f1db46cec9ad6d345498b9d6 5ea33d6ac3411ef5a63857af1a594dc2 c167333728601de33f1aa5a1f60d5198 deb3e1b067f6c0d7f52532240704e192 d626ada670876a52163dd31dd77aeb41 509f8b7dd217d36d2d2c8e33b6efdca9 df55412f4f8a720b6c544f2d2fbdfcb7 eaeccd961c9ad3dde86fef2a1da107fc f03138026e77980e42a86aa56fa981e6 376238a7c75a136ad52c50cbbf682ee9 e9e7f00d9a3e2c2beb9e674a06be304c cf9aa95ce06affb0c8e99b1c0bcdb8bd 3768df9af78a0e38bae914e8cf4036c7 933b9071e89cf69e04f0a00584b36137 b9849a09eaf7904b136a7e8fdcc826cc]"
+    }
+  ]
+}

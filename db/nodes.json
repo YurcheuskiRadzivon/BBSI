@@ -1,0 +1,662 @@
+{
+  "nodes": [
+    {
+      "transaction": {
+        "tx_id": "376238a7c75a136ad52c50cbbf682ee9",
+        "document_id": "DEMO-6tgfhh",
+        "document_type": "diploma",
+        "document_hash": "8d799f3c6e361ce97b76a8b008c32ca2d0b8dd6dd372c1b6320d60c32c87e5bb",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419260,
+        "issuer_signature": "3045022100e107b26f2c5b7d918d0509e9187de5277d6aa62c99ae22429f3fa22d48482e7802201869c2f1e37b5eb079db43ba3a86ee155a486fb384ac33b319d2e47e7f082d71",
+        "metadata_hash": "48774fd6d99598bdf0b8dff358d0ebee946db30c5db8666e59f78efbe6ad45b9"
+      },
+      "parent_ids": [
+        "f03138026e77980e42a86aa56fa981e6"
+      ],
+      "node_hash": "2b7cf73adc1179a29f373b941654904006d33393f001e572a1cbe6c1a6b5d9d2"
+    },
+    {
+      "transaction": {
+        "tx_id": "3768df9af78a0e38bae914e8cf4036c7",
+        "document_id": "DEMO-law35q",
+        "document_type": "diploma",
+        "document_hash": "66d104bd67f79df9201c5a3b368dfc307deaad77775d34d8aebd966dc5eb91bc",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419260,
+        "issuer_signature": "30460221008aad682cfd12086060ff1d83a00750537b371b6e4ad8eb2e77ea70f700bd2160022100d8f8f84b7c1e6fa999b0403546fdd22bacf98353f86dd423e48031bb20dd81af",
+        "metadata_hash": "bc831bf63fd0c8c8ee91d206988b7d7f592d5f5f7c42e9ffdca800257e282b01"
+      },
+      "parent_ids": [
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd"
+      ],
+      "node_hash": "171fa9e00c0b9c660d2fdd09a344d823f1783c7653d416393afdf083ae9a25bf"
+    },
+    {
+      "transaction": {
+        "tx_id": "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "document_id": "DEMO-oabywg",
+        "document_type": "diploma",
+        "document_hash": "64afbbfde11ee5ef53d3f6de46a350a7cd581a08c6d77bf18cc0f6eefa7d6dbb",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419259,
+        "issuer_signature": "304502207b17e8bc8b5bcbd4c50052994f7c86223dbb81e2c771d527bd364313ab413968022100ce30f0949a7b3843300741fe8c53995863f35d79b3f9b756ee27cabf03c119ba",
+        "metadata_hash": "8243dcc0e7579384392281c202092731ae2c1d2e22ac254c355376df5a7e9cba"
+      },
+      "parent_ids": [
+        "d626ada670876a52163dd31dd77aeb41"
+      ],
+      "node_hash": "c2a727f818ddbf0de91ac3d60b81964b43f11687f02de342bdd9f36c6dca5b17"
+    },
+    {
+      "transaction": {
+        "tx_id": "5ea33d6ac3411ef5a63857af1a594dc2",
+        "document_id": "DEMO-r9nic4",
+        "document_type": "diploma",
+        "document_hash": "d7a3c352efb9c6b3810b952091416187af33d97c8500e757e6ff80d9183a430b",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419255,
+        "issuer_signature": "30460221009b9aa9e39695fba01ddc985145c23928f61afdda35073e311e236b6d976f16ee022100df3d5012b2c9ae90bdc987ed3cf745e2c25d49ffdcfefee4bfc91bc9a1ec820e",
+        "metadata_hash": "9751a9ad059a258c050e119be47d6eb567aeae90acf160182c76590e051ae508"
+      },
+      "parent_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6"
+      ],
+      "node_hash": "550d1f81596cdf7a5a452844afef907c228809eab27b9790c871364f897e7177"
+    },
+    {
+      "transaction": {
+        "tx_id": "933b9071e89cf69e04f0a00584b36137",
+        "document_id": "DEMO-ekby8b",
+        "document_type": "diploma",
+        "document_hash": "31ef8d6b5b6a8ce58f1fec9a378bd08cd92196f0ead2c9bb6084cb3a2489f84b",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419261,
+        "issuer_signature": "304502207da74a9a83013e1354ffd4b23d4ed74a71554a75e6840d9981d2da4987bedf15022100bd9990752d94c0d191f46904b5f4d261944622e67680352a7cdfffafceffe40c",
+        "metadata_hash": "3fc19ec0443bd4b6b2e7731703a7739599f6fddaef7a8a0c9d36636ddeeeee2a"
+      },
+      "parent_ids": [
+        "3768df9af78a0e38bae914e8cf4036c7"
+      ],
+      "node_hash": "a70be1698239383d72009b348988e088b4f2077c9dadc164326998c2270828e1"
+    },
+    {
+      "transaction": {
+        "tx_id": "b6b17f24f1db46cec9ad6d345498b9d6",
+        "document_id": "DEMO-v2q22z",
+        "document_type": "diploma",
+        "document_hash": "d40ead1e6a0117e5103307e53ae24247ca9249ca90ed04a0c52a9dd3b0debb5c",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419255,
+        "issuer_signature": "3044022056a6a1538fb20d78264156918316346fc37fbc627b1f2407f0b14399a5c8e7500220130391f45d272517fcad437d18c16b3369cc84be2a114deb114746276fe02ef5",
+        "metadata_hash": "ef5acea263c98e92048fcdf375e3d64bb152b842505354245d7fbc1e4733d8ea"
+      },
+      "parent_ids": null,
+      "node_hash": "39fc8c353df65ec83e2e784937300286dd1ed570c9fb61c15e440394d14e96ed"
+    },
+    {
+      "transaction": {
+        "tx_id": "b9849a09eaf7904b136a7e8fdcc826cc",
+        "document_id": "DEMO-ekby8b",
+        "document_type": "diploma",
+        "document_hash": "",
+        "issuer_country": "BY",
+        "issuer_authority": "Revocation",
+        "receiver_country": "BY",
+        "action": "revoke",
+        "timestamp": 1777419275,
+        "issuer_signature": "3045022100c534d88e5202e854c7b730a435caf7ce1439b383d27e076bc5ccdee7ead6c4c102203c6e1b241e673493f2e8f18c89916fe564d777a135de89dd193ed5655dd4d571",
+        "metadata_hash": "777ac4ea0a6e6f4d1301fd1cf8aa9183f44f435be43c75a6615ba307c266e5a7"
+      },
+      "parent_ids": [
+        "933b9071e89cf69e04f0a00584b36137"
+      ],
+      "node_hash": "3c8357ce083319a0d8ef19cd99ec7b789cc58231f72dc62198370aaa448d272c"
+    },
+    {
+      "transaction": {
+        "tx_id": "c167333728601de33f1aa5a1f60d5198",
+        "document_id": "DEMO-mz10n4",
+        "document_type": "diploma",
+        "document_hash": "4987fcbd4796e789742e5ae2781b6bccc2dbccb324e444ff2f7ff8521cf440aa",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419256,
+        "issuer_signature": "3045022100b97efabfe2722eb418eafaa3d18960179961586f76644927772b29f5e51e0f0302207fee9e034fda4fdc06b63759ab7549c0b048f050c9254adc32cda29577cd907d",
+        "metadata_hash": "39010c484cf1ea7f79151e34217c03e9b7abc19ed97c6092f08ac4ad5d838099"
+      },
+      "parent_ids": [
+        "5ea33d6ac3411ef5a63857af1a594dc2"
+      ],
+      "node_hash": "b7387d489d916d389054f48ae0a43624a0e06112a0b36f59a8d0126ed4706227"
+    },
+    {
+      "transaction": {
+        "tx_id": "cf9aa95ce06affb0c8e99b1c0bcdb8bd",
+        "document_id": "DEMO-6mjdok",
+        "document_type": "diploma",
+        "document_hash": "e9181599c22f24f30abf78606318e368417f8ffb7aea9e3f48b7a0fa9af1df56",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419260,
+        "issuer_signature": "304402205045706c746ba5d1f0c06f3e875f1ce5470d9cbac22a73dad007fede12b063c1022051621d51f31b9b9e655513ab134f4e7dc9d96fe5e9400c5433370e30684fae72",
+        "metadata_hash": "3a395d08e5efd4fcf35937b25d6a1feb010c84d672f5aee61228b5cc14942f7f"
+      },
+      "parent_ids": [
+        "e9e7f00d9a3e2c2beb9e674a06be304c"
+      ],
+      "node_hash": "087a2a66641c960e1d5b10ae59ae737b52d16c6f20c7472b42f7cca815991694"
+    },
+    {
+      "transaction": {
+        "tx_id": "d626ada670876a52163dd31dd77aeb41",
+        "document_id": "DEMO-al5x5y",
+        "document_type": "diploma",
+        "document_hash": "ca7cc86b0a58706eba77b30fff0e2699ec2a9c8cd16b58d02e1bf8b443ab2dda",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419259,
+        "issuer_signature": "30460221008ebb4a215fb5b98fafc017830472547301f5c8426946f1dc8eb69bea903fe52f0221009ef95d8ba58edebc4731f458973c5020b235647f4bbd078e505bb8e799fae864",
+        "metadata_hash": "9e2772a60e9864e6ac90169f84ff9c6ea3d4b205ba5128b0d0e1a01de71d3d6b"
+      },
+      "parent_ids": [
+        "deb3e1b067f6c0d7f52532240704e192"
+      ],
+      "node_hash": "5336527036ed8fd4abfa15af44bf71ed3f38c00b3445fff863531ad05bf0be6d"
+    },
+    {
+      "transaction": {
+        "tx_id": "deb3e1b067f6c0d7f52532240704e192",
+        "document_id": "DEMO-wbivr5",
+        "document_type": "diploma",
+        "document_hash": "b5e773c92a4527882892e496367191011dee057fb3b85b3dbe4c5e1a93515743",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419257,
+        "issuer_signature": "3045022015087b7346a41d9e12aeecae58f3ad69df77dd802207caca134141cb26149885022100938352f2660f476008022e90a2298a32efbefa43f728a90e6a5946aa811885cf",
+        "metadata_hash": "5e32f984992705f4134c484886a6e57751e434cfb8263f0b389698fe72dacbaa"
+      },
+      "parent_ids": [
+        "c167333728601de33f1aa5a1f60d5198"
+      ],
+      "node_hash": "51ccaa9254649c2e18c2b59adbcde4e4d2c73575e4f3d3561f6b526abc257ccf"
+    },
+    {
+      "transaction": {
+        "tx_id": "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "document_id": "DEMO-8fuq4f",
+        "document_type": "diploma",
+        "document_hash": "effeceb95697ce6febb4da9e52c905e193c40dd9a3e2301944d31701b9f9642b",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419259,
+        "issuer_signature": "304502202391f8e2699bc94b10f9bac9c55db62cf1a491a30c44f1d384ceedf850abee6602210092f5a3ea55afc54c935f232cd640c99b2101c4d8a423d2da6471d9ee527eb409",
+        "metadata_hash": "e9c72349bf0a19e13b0725aacd0036045afe281e71f1df55e72f06ecf93d9326"
+      },
+      "parent_ids": [
+        "509f8b7dd217d36d2d2c8e33b6efdca9"
+      ],
+      "node_hash": "957fc1071dc979119f4191bde8c5ce23c8240df567be4193635cf167250ff06b"
+    },
+    {
+      "transaction": {
+        "tx_id": "e9e7f00d9a3e2c2beb9e674a06be304c",
+        "document_id": "DEMO-cpglf5",
+        "document_type": "diploma",
+        "document_hash": "29f8abdd298815ebdd8be01c6879d9f1151e2a877f2bbbc38b9af8e8d9fec06f",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419260,
+        "issuer_signature": "304502205845083273f0be4ffaa5b5b17487799166b8e62e7779d0fa2e106b2b5ab24d5c022100c99b24161db808322ac62fb7bdd08f3b6cccf932ab0069b2eb5ddb5fe85677ef",
+        "metadata_hash": "b41d5110f6cbc1506d036f4d96079309aa1c802d0a1a7755095424ca0295405f"
+      },
+      "parent_ids": [
+        "376238a7c75a136ad52c50cbbf682ee9"
+      ],
+      "node_hash": "70f3983e1c8df8fcd16fc51734f63781e8e094cbc99267e0705ea7a54f906d6a"
+    },
+    {
+      "transaction": {
+        "tx_id": "eaeccd961c9ad3dde86fef2a1da107fc",
+        "document_id": "DEMO-t0j9h6",
+        "document_type": "diploma",
+        "document_hash": "bf8fc7ec373f2d246a553570d16b6bac722b069f08dcab081dea3c34c67139b2",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419260,
+        "issuer_signature": "3046022100ca9f2b49c604e0693fb2d598218594a40c5275a2c1d4332e3fb96968a2cf15ff022100a864f9c9445ca1504a87054d6f205d6c2060ea7fedd68a14392843fa09d65c98",
+        "metadata_hash": "01cb491fb6accaff9c457e2aa6877486c47a02140fa9587526ea837f7f3d7db3"
+      },
+      "parent_ids": [
+        "df55412f4f8a720b6c544f2d2fbdfcb7"
+      ],
+      "node_hash": "77113c428221952dc61b697ba7916f5f3c04ed641a228fabca3d35fed4cc4532"
+    },
+    {
+      "transaction": {
+        "tx_id": "f03138026e77980e42a86aa56fa981e6",
+        "document_id": "DEMO-iqwhpl",
+        "document_type": "diploma",
+        "document_hash": "02bab135cb2e3d412769048dde968a9235eb6047fbec502951dc01919dba63b1",
+        "issuer_country": "BY",
+        "issuer_authority": "Министерство образования РБ",
+        "receiver_country": "RU",
+        "action": "issue",
+        "timestamp": 1777419260,
+        "issuer_signature": "30460221008fa61895cc11cfe8f647346f3a4b2f891b8ce0b29660d5da501506db71d840ac022100cad82d0da5b354abac10c070a1aa6db652cf0249f3aa28fd45921fdfabd8801e",
+        "metadata_hash": "3f24906ce0d98ba14a9c863e6ce902b3d99861a1f1e8b0486e83eef784665e10"
+      },
+      "parent_ids": [
+        "eaeccd961c9ad3dde86fef2a1da107fc"
+      ],
+      "node_hash": "b62a9d68c6ec22d218047742589e9a769e3029cc6d770b7116530a1bcafb654c"
+    }
+  ],
+  "gossip_events": [
+    {
+      "seq": 1,
+      "timestamp": 1777419255525,
+      "tx_id": "b6b17f24f1db46cec9ad6d345498b9d6",
+      "parent_ids": null,
+      "peer_hints": null
+    },
+    {
+      "seq": 2,
+      "timestamp": 1777419255834,
+      "tx_id": "5ea33d6ac3411ef5a63857af1a594dc2",
+      "parent_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6"
+      ],
+      "peer_hints": [
+        "b6b17f24f1db46cec9ad6d345498b9d6"
+      ]
+    },
+    {
+      "seq": 3,
+      "timestamp": 1777419256151,
+      "tx_id": "c167333728601de33f1aa5a1f60d5198",
+      "parent_ids": [
+        "5ea33d6ac3411ef5a63857af1a594dc2"
+      ],
+      "peer_hints": [
+        "5ea33d6ac3411ef5a63857af1a594dc2"
+      ]
+    },
+    {
+      "seq": 4,
+      "timestamp": 1777419257772,
+      "tx_id": "deb3e1b067f6c0d7f52532240704e192",
+      "parent_ids": [
+        "c167333728601de33f1aa5a1f60d5198"
+      ],
+      "peer_hints": [
+        "c167333728601de33f1aa5a1f60d5198"
+      ]
+    },
+    {
+      "seq": 5,
+      "timestamp": 1777419259234,
+      "tx_id": "d626ada670876a52163dd31dd77aeb41",
+      "parent_ids": [
+        "deb3e1b067f6c0d7f52532240704e192"
+      ],
+      "peer_hints": [
+        "deb3e1b067f6c0d7f52532240704e192"
+      ]
+    },
+    {
+      "seq": 6,
+      "timestamp": 1777419259682,
+      "tx_id": "509f8b7dd217d36d2d2c8e33b6efdca9",
+      "parent_ids": [
+        "d626ada670876a52163dd31dd77aeb41"
+      ],
+      "peer_hints": [
+        "d626ada670876a52163dd31dd77aeb41"
+      ]
+    },
+    {
+      "seq": 7,
+      "timestamp": 1777419259904,
+      "tx_id": "df55412f4f8a720b6c544f2d2fbdfcb7",
+      "parent_ids": [
+        "509f8b7dd217d36d2d2c8e33b6efdca9"
+      ],
+      "peer_hints": [
+        "509f8b7dd217d36d2d2c8e33b6efdca9"
+      ]
+    },
+    {
+      "seq": 8,
+      "timestamp": 1777419260081,
+      "tx_id": "eaeccd961c9ad3dde86fef2a1da107fc",
+      "parent_ids": [
+        "df55412f4f8a720b6c544f2d2fbdfcb7"
+      ],
+      "peer_hints": [
+        "df55412f4f8a720b6c544f2d2fbdfcb7"
+      ]
+    },
+    {
+      "seq": 9,
+      "timestamp": 1777419260267,
+      "tx_id": "f03138026e77980e42a86aa56fa981e6",
+      "parent_ids": [
+        "eaeccd961c9ad3dde86fef2a1da107fc"
+      ],
+      "peer_hints": [
+        "eaeccd961c9ad3dde86fef2a1da107fc"
+      ]
+    },
+    {
+      "seq": 10,
+      "timestamp": 1777419260450,
+      "tx_id": "376238a7c75a136ad52c50cbbf682ee9",
+      "parent_ids": [
+        "f03138026e77980e42a86aa56fa981e6"
+      ],
+      "peer_hints": [
+        "f03138026e77980e42a86aa56fa981e6"
+      ]
+    },
+    {
+      "seq": 11,
+      "timestamp": 1777419260625,
+      "tx_id": "e9e7f00d9a3e2c2beb9e674a06be304c",
+      "parent_ids": [
+        "376238a7c75a136ad52c50cbbf682ee9"
+      ],
+      "peer_hints": [
+        "376238a7c75a136ad52c50cbbf682ee9"
+      ]
+    },
+    {
+      "seq": 12,
+      "timestamp": 1777419260786,
+      "tx_id": "cf9aa95ce06affb0c8e99b1c0bcdb8bd",
+      "parent_ids": [
+        "e9e7f00d9a3e2c2beb9e674a06be304c"
+      ],
+      "peer_hints": [
+        "e9e7f00d9a3e2c2beb9e674a06be304c"
+      ]
+    },
+    {
+      "seq": 13,
+      "timestamp": 1777419260962,
+      "tx_id": "3768df9af78a0e38bae914e8cf4036c7",
+      "parent_ids": [
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd"
+      ],
+      "peer_hints": [
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd"
+      ]
+    },
+    {
+      "seq": 14,
+      "timestamp": 1777419261142,
+      "tx_id": "933b9071e89cf69e04f0a00584b36137",
+      "parent_ids": [
+        "3768df9af78a0e38bae914e8cf4036c7"
+      ],
+      "peer_hints": [
+        "3768df9af78a0e38bae914e8cf4036c7"
+      ]
+    },
+    {
+      "seq": 15,
+      "timestamp": 1777419275205,
+      "tx_id": "b9849a09eaf7904b136a7e8fdcc826cc",
+      "parent_ids": [
+        "933b9071e89cf69e04f0a00584b36137"
+      ],
+      "peer_hints": [
+        "933b9071e89cf69e04f0a00584b36137"
+      ]
+    }
+  ],
+  "gossip_votes": [
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6",
+        "376238a7c75a136ad52c50cbbf682ee9"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6",
+        "376238a7c75a136ad52c50cbbf682ee9",
+        "e9e7f00d9a3e2c2beb9e674a06be304c"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6",
+        "376238a7c75a136ad52c50cbbf682ee9",
+        "e9e7f00d9a3e2c2beb9e674a06be304c",
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6",
+        "376238a7c75a136ad52c50cbbf682ee9",
+        "e9e7f00d9a3e2c2beb9e674a06be304c",
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd",
+        "3768df9af78a0e38bae914e8cf4036c7"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6",
+        "376238a7c75a136ad52c50cbbf682ee9",
+        "e9e7f00d9a3e2c2beb9e674a06be304c",
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd",
+        "3768df9af78a0e38bae914e8cf4036c7",
+        "933b9071e89cf69e04f0a00584b36137"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    },
+    {
+      "round": 1,
+      "winner_tx_ids": [
+        "b6b17f24f1db46cec9ad6d345498b9d6",
+        "5ea33d6ac3411ef5a63857af1a594dc2",
+        "c167333728601de33f1aa5a1f60d5198",
+        "deb3e1b067f6c0d7f52532240704e192",
+        "d626ada670876a52163dd31dd77aeb41",
+        "509f8b7dd217d36d2d2c8e33b6efdca9",
+        "df55412f4f8a720b6c544f2d2fbdfcb7",
+        "eaeccd961c9ad3dde86fef2a1da107fc",
+        "f03138026e77980e42a86aa56fa981e6",
+        "376238a7c75a136ad52c50cbbf682ee9",
+        "e9e7f00d9a3e2c2beb9e674a06be304c",
+        "cf9aa95ce06affb0c8e99b1c0bcdb8bd",
+        "3768df9af78a0e38bae914e8cf4036c7",
+        "933b9071e89cf69e04f0a00584b36137",
+        "b9849a09eaf7904b136a7e8fdcc826cc"
+      ],
+      "reason": "упорядочивание по глубине в DAG + timestamp + tx_id (виртуальное голосование)"
+    }
+  ]
+}
