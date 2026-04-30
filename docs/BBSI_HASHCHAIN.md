@@ -1,285 +1,336 @@
-# BBSI: подробное описание «хэшчейна» (DAG), хранения и логики
+# BBSI: процессы «хэшчейна» (DAG) и где они выполняются в коде
 
-Документ описывает реализацию в кодовой базе проекта **BBSI**: как устроен журнал транзакций в виде **DAG** (направленный ациклический граф), какие используются **криптографические примитивы** (важно: это не «шифрование содержимого документов», а в основном **цифровые подписи ECDSA** и **хэши SHA-256**), где лежит **консенсус-подобная** логика, и как проходят сценарии **выдачи**, **отзыва**, **проверки документа** и **полной валидации цепочки**.
-
-Пути к файлам указаны **от корня репозитория** (например `internal/dag/store.go`).
+Документ переписан вокруг пяти тем: **консенсус**, **подпись**, **SHA-256**, **построение цепочки и узел**, **выдача и отзыв**. Все пути — от корня репозитория (`internal/...`, `cmd/...`).
 
 ---
 
-## 1. Общая архитектура процесса
+## Вводное замечание
 
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                         процесс bbsi                               │
-│  cmd/bbsi/main.go: открывает каталог БД, ключи, Store, HTTP API   │
-└─────────────────────────────────────────────────────────────────┘
-          │                         │
-          ▼                         ▼
-   db/*.json (диск)          internal/dag/store.go
-   authority_keys.json       журнал узлов в памяти + gossip
-          │                         │
-          └─────────────┬───────────┘
-                        ▼
-              internal/api/server.go
-              REST: issue, revoke, verify (lookup), validate, dag…
-```
+В проекте нет классического **шифрования** содержимого документов в журнале: хранятся **хэши** содержимого и метаданных и **цифровая подпись ECDSA** транзакции. «Хэшчейн» здесь — это **DAG** из узлов, связанных ссылками на родителей, где каждый узел имеет поле **`node_hash`**, вычисляемое из транзакции и хэшей родительских узлов.
 
-- **Точка входа:** `cmd/bbsi/main.go`. Каталог БД: переменная окружения `BBSI_DB`, иначе `db`.
-- **Журнал цепочки:** структура `dag.Store` (`internal/dag/store.go`) хранит узлы в памяти и синхронизирует их с файлом `nodes.json`.
-- **Ключи эмитентов:** `internal/crypto/persist.go` — файл `{БД}/authority_keys.json` (ECDSA P-256 по странам).
-- **HTTP:** `internal/api/server.go` — маршруты `/api/...`, статика `web/`.
+Центральный объект журнала: **`dag.Store`** (`internal/dag/store.go`).
+
+Единая функция добавления узла в граф (после проверок): **`appendTransaction`** → **`appendTransactionLocked`** в **`internal/dag/store.go`**.
+
+Сохранение на диск: **`persistGraph`** в **`internal/dag/persistence.go`** → файл **`{БД}/nodes.json`** (имя файла задаётся **`internal/db/db.go`**, константа **`FileNodes`**).
 
 ---
 
-## 2. Как хранится состояние (файловая БД)
+## 1. Консенсус: как здесь устроено и где в коде
 
-Обёртка над каталогом JSON: `internal/db/db.go`, тип `db.Database`. Константы имён файлов — в том же пакете (`FileNodes`, `FileDocuments`, …).
+### 1.1. Что это означает в BBSI
 
-| Файл (относительно каталога БД, по умолчанию `db/`) | Назначение |
-|-----------------------------------------------------|------------|
-| `nodes.json` | Единый файл графа: массив узлов DAG + журнал gossip-событий + «виртуальные голоса». Читается при старте и после явной перезагрузки (см. ниже). |
-| `authority_keys.json` | Приватные ключи ECDSA по кодам стран (PEM в JSON). Без него при каждом запуске ключи менялись бы и все подписи в `nodes.json` стали бы недействительными. |
-| `documents.json` | Реестр документов для UI: эталонные payload’ы и хэши выпуска, `last_tx_id`, `last_action` (issue/revoke). **Не** является источником истины для криптографической целостности DAG — источник узлы в `nodes.json`. |
-| `types.json`, `emitents.json`, `authorities.json` | Справочники для интерфейса (типы документов, страны, органы). |
-| `logs.json` | Операционный лог сообщений (в т.ч. итог `/api/validate`). |
-| `attack_logs.json` | Строки журнала симуляций атак (API атак + серверный буфер). |
+Здесь **нет** распределённого протокола согласия между независимыми репликами по сети (не Raft/PBFT/Bitcoin). Всё выполняется **в одном процессе** сервера.
 
-Формат записи графа на диск задаётся типом `persistedGraph` в `internal/dag/persistence.go`:
+После **каждого** добавления узла в DAG выполняются два связанных действия:
 
-- `nodes` — список `DAGNode`;
-- `gossip_events` — события из `consensus.GossipState.Events`;
-- `gossip_votes` — шаги «виртуального голосования» (`VirtualVoteStep`).
+1. **Запись «события gossip»** — упрощённая шкала «новый узел и его родители».
+2. **«Виртуальное голосование»** — детерминированное **упорядочивание всех узлов графа** по правилам глубины в DAG и времён; результат сохраняется как один шаг с упорядоченным списком `tx_id`.
 
-Узел (`internal/dag/node.go`, структура `DAGNode`):
+Это **демонстрационная абстракция**: журнал событий и шаг «голосования» сериализуются в **`nodes.json`** вместе с узлами.
 
-- `transaction` — `model.DocumentTransaction` (`internal/model/types.go`): идентификаторы, хэши содержимого/метаданных, страны, `action` (`issue` | `revoke`), время, подпись;
-- `parent_ids` — ссылки на `tx_id` родительских узлов;
-- `node_hash` — агрегирующий хэш узла (см. раздел 4).
+### 1.2. Где вызывается
+
+Файл **`internal/dag/store.go`**, функция **`appendTransactionLocked`** (конец функции, после записи узла в `s.nodes`):
+
+1. **`s.gossip.LogGossip(txID, parentIDs, peerSeen)`** — протокол в **`internal/consensus/gossip.go`**, метод **`GossipState.LogGossip`**.
+
+   Передаётся `seen`, собранный из списка родителей (в коде это текущие `parent_ids` нового узла).
+
+2. Сбор всех узлов в **`[]consensus.NodeOrder`** (поля `TxID`, `ParentIDs`, `Timestamp`) через **`allNodesLocked`**.
+
+3. **`s.gossip.RunVirtualVote(orders)`** — в **`internal/consensus/gossip.go`**, метод **`GossipState.RunVirtualVote`**.
+
+4. Итог пишется в операционный лог строкой вида «Gossip: добавлен узел …, виртуальный порядок: …» через **`s.log`** (`internal/dag/store.go`).
+
+### 1.3. Алгоритм `RunVirtualVote` (по коду)
+
+Файл **`internal/consensus/gossip.go`**.
+
+- Для каждого `tx_id` вычисляется **глубина** в графе: рекурсивно по родителям (`visit`), без родителей глубина 0, иначе `max(глубина родителей) + 1`.
+- Строится список `(tx_id, depth, timestamp)` и сортируется:
+  - сначала по **возрастанию depth**,
+  - при равенстве — по **возрастанию timestamp**,
+  - при равенстве — по **лексикографическому порядку `tx_id`**.
+- Добавляется **`VirtualVoteStep`** с **`WinnerTxIDs`** = все узлы в этом упорядоченном порядке, **`Reason`** — текстовая строка из кода.
+
+### 1.4. Где хранится на диске
+
+Структура **`persistedGraph`** в **`internal/dag/persistence.go`**:
+
+- **`gossip_events`** ← **`GossipState.Events`** (`GossipEvent`);
+- **`gossip_votes`** ← **`GossipState.Votes`** (`VirtualVoteStep`, JSON-тег поля **`virtual_votes`**).
+
+Читание/запись того же файла, что и узлы DAG — **`nodes.json`**.
 
 ---
 
-## 3. Загрузка и сохранение графа
+## 2. Подпись: как работает и где в коде
 
-| Действие | Файл кода |
-|----------|-----------|
-| Чтение `nodes.json` при старте | `internal/dag/persistence.go` — `loadFromDisk` → `replacePersistedGraph` |
-| Запись графа после изменений | `persistGraph` в том же файле |
-| Перечитывание диска без перезапуска (перед validate и verify lookup) | `ReloadChainFromDisk` в `internal/dag/persistence.go` |
+### 2.1. Модель
 
-**Миграция legacy:** если в старых данных попадались узлы с `action: verify`, при загрузке вызывается `sanitizePersistedGraph`: такие узлы удаляются, родители перепривязываются, `node_hash` пересчитывается (`sanitizePersistedGraph`, `recomputeAllNodeHashes`). В журнале остаются только **issue** и **revoke**.
+Используется **ECDSA на кривой P-256**. Отдельный ключ для каждого кода страны (**BY**, **RU**, **KZ**, **AM**, **AZ**) из **`internal/model/types.go`**.
 
-Сброс данных: `internal/api/server.go` — `handleResetDB`; логика очистки памяти и файлов — `dag.Store.ResetChainAndLogs` (`internal/dag/store.go`), регенерация ключей — `crypto.RegenerateAuthorityKeys` (`internal/crypto/persist.go`).
+Ключи держит тип **`crypto.AuthorityKeys`** (**`internal/crypto/keys.go`**):
 
----
+- **`private`** / **`public`** — карты по коду страны.
 
-## 4. Криптография и хэши (где что считается)
+Загрузка и сохранение ключей на диск:
 
-### 4.1. Терминология
+- **`internal/crypto/persist.go`** — **`LoadOrCreateAuthorityKeys`**, файл **`{каталог_БД}/authority_keys.json`**.
 
-- **Шифрование** содержимого диплома/ПДн в коде **не** реализовано: в цепочке хранятся **хэши** (`document_hash`, `metadata_hash`) и **подпись** транзакции.
-- Используется **ECDSA** на кривой **P-256** (`internal/crypto/keys.go`): генерация ключей `ecdsa.GenerateKey(elliptic.P256(), ...)`.
-- Подпись: **SHA-256** от канонического тела сообщения, затем **ECDSA SignASN1 / VerifyASN1**.
+### 2.2. Что именно подписывается
 
-### 4.2. Каноническое тело транзакции (без подписи)
+Подпись строится **не над всем JSON узла**, а над **каноническим представлением полей транзакции без поля подписи**:
 
-Файл: `internal/crypto/canonical.go`, функция `CanonicalJSONWithoutSig`.
+Функция **`CanonicalJSONWithoutSig`** — **`internal/crypto/canonical.go`**.
 
-В подпись и в расчёт «содержательного» хэша входят поля (ключи сортируются, объект сериализуется в JSON):
+В объект входят поля (ключи сортируются, затем `json.Marshal`):
 
 `action`, `document_hash`, `document_id`, `document_type`, `issuer_authority`, `issuer_country`, `metadata_hash`, `receiver_country`, `timestamp`, `tx_id`.
 
-Поле **`issuer_signature` в канонизацию не входит** — подпись считается по телу без неё.
+Поле **`issuer_signature` намеренно отсутствует**, иначе было бы циклическое определение подписи.
 
-**Content hash транзакции:** `ContentHash(tx)` = SHA-256(hex от канонического JSON). Используется внутри вычисления `node_hash`.
+### 2.3. Цепочка вызовов при записи узла
 
-### 4.3. Подпись транзакции
-
-Файл: `internal/crypto/keys.go`.
-
-- `SignTransaction(tx)` сериализует каноническое тело, считает SHA-256 от байтов тела, подписывает **приватным ключом страны** `tx.IssuerCountry`, записывает подпись в `tx.IssuerSignature` (hex ASN.1).
-- `VerifyTransaction(tx)` загружает публичный ключ для `IssuerCountry` и проверяет подпись.
-
-**Важно:** отзыв (`revoke`) тоже подписывается тем же механизмом; допустимость отзыва по бизнес-правилам проверяется в `AddRevoke` (эмитент совпадает с эмитентом выпуска).
-
-### 4.4. Хэши документа и метаданных (payload → SHA-256)
-
-Для пользовательских JSON (document / metadata) используется канонизация произвольного JSON: `internal/crypto/jsoncanon.go` (`canonicalizeJSON`, `HashCanonicalJSON` и др.), чтобы одинаковые данные давали один хэш.
-
-На стороне API хэши подставляются/проверяются в `internal/api/server.go` — функция `applyDocumentAndMetaHashes` (согласование явных хэшей и вычисление из payload).
-
-### 4.5. Хэш узла (`node_hash`) и Merkle по родителям
-
-Файл: `internal/dag/node.go`, функция `ComputeNodeHash`.
-
-Алгоритм:
-
-1. `ContentHash(tx)` — SHA-256 канонической транзакции (см. 4.2).
-2. Для каждого `parent_id` берётся **`node_hash` родителя** (не хэш транзакции родителя напрямую, а сохранённое поле узла).
-3. По списку хэшей родителей считается **корень Merkle** — `internal/crypto/hash.go`, `MerkleRoot` (листья сортируются на каждом уровне по описанной в коде схеме).
-4. Итоговая строка:  
-   `SHA256( tx_id "|" contentHash "|" merkleRoot "|" timestamp )`  
-   (как строка в `fmt.Sprintf`, затем байты UTF-8 → SHA-256 → hex).
-
-Так узел криптографически «привязан» к родителям и к содержимому транзакции.
-
-### 4.6. Файл ключей
-
-`internal/crypto/persist.go`:
-
-- путь: `{БД}/authority_keys.json`;
-- формат: версия + map `private_keys_pem` по кодам стран;
-- загрузка: `LoadOrCreateAuthorityKeys`;
-- при полном сбросе БД: `RegenerateAuthorityKeys`.
-
----
-
-## 5. «Консенсус» и gossip (что это в проекте)
-
-Здесь **нет** распределённого протокола консенсуса между независимыми узлами сети (как в Bitcoin/PoS). Всё выполняется **внутри одного процесса**.
-
-Файл: `internal/consensus/gossip.go`.
-
-- При добавлении узла (`appendTransactionLocked` в `internal/dag/store.go`) вызываются:
-  - `GossipState.LogGossip` — добавляется запись о событии (seq, время, tx_id, родители, подсказки «peer»);
-  - `RunVirtualVote` — **детерминированное упорядочивание** всех узлов: вычисляется «глубина» в DAG, затем сортировка по глубине, timestamp, `tx_id`; результат сохраняется как `VirtualVoteStep` с полем `WinnerTxIDs` и пояснением в `Reason`.
-
-Это **демонстрационная** модель порядка обработки / «голосования», а не согласование нескольких реплик БД. Данные пишутся в `nodes.json` вместе с узлами.
-
----
-
-## 6. Жизненный цикл транзакций в DAG
-
-Общая точка добавления узла: `appendTransaction` → `appendTransactionLocked` (`internal/dag/store.go`).
-
-Этапы для **каждой** новой транзакции:
-
-1. Проверка: `action` только `issue` или `revoke`.
-2. Генерация `tx_id` и при необходимости `timestamp`.
-3. Разрешение родителей: если `parent_ids` пустой и граф не пуст — подставляются **tips** (головы DAG), см. `tipsLocked`.
-4. Сбор `parent_node_hash` для каждого родителя.
-5. **Подпись** `SignTransaction`.
-6. **Вычисление** `ComputeNodeHash` и создание `DAGNode`.
-7. Запись в `s.nodes`, вызов gossip + RunVirtualVote.
-8. **Сохранение** `persistGraph` → `nodes.json`.
-
-Публичные обёртки:
-
-- `AddIssue` — только `action == issue`;
-- `AddRevoke` — только `action == revoke`, плюс проверка эмитента через `findIssuerForDoc`.
-
----
-
-## 7. Выдача документа (issue)
-
-| Этап | Где в коде |
-|------|------------|
-| HTTP POST | `internal/api/server.go` — `handleIssue`, маршрут `/api/tx/issue` |
-| Разбор тел и хэшей | `applyDocumentAndMetaHashes` в том же файле |
-| Сборка `DocumentTransaction` с `ActionIssue` | `handleIssue` |
-| Добавление в граф | `s.Store.AddIssue` → `internal/dag/store.go` |
-| Обновление реестра для UI | `db.UpsertDocument` — `internal/db/documents.go` |
-
-После успешного issue в `documents.json` сохраняются payload’ы и хэши, ссылки на последний узел и действие.
-
----
-
-## 8. Отзыв документа (revoke)
-
-| Этап | Где в коде |
-|------|------------|
-| HTTP POST | `internal/api/server.go` — `handleRevoke`, маршрут `/api/tx/revoke` |
-| Проверка эмитента до записи | `AddRevoke` → `findIssuerForDoc` — `internal/dag/store.go` |
-| Подпись и узел | общий путь `appendTransaction` |
-| Реестр | `db.UpsertDocumentLastAction` — `internal/db/documents.go` |
-
-В графе узел **issue не удаляется** — добавляется новый узел **revoke**, обычно с родителями по умолчанию (tips), если клиент не передал своих.
-
----
-
-## 9. Проверка документа (не узел цепочки)
-
-Операция **не создаёт** транзакцию в DAG.
-
-| Этап | Где в коде |
-|------|------------|
-| HTTP POST | `internal/api/server.go` — `handleVerifyLookup`, маршрут `/api/verify` |
-| Перезагрузка диска | `ReloadChainFromDisk` перед проверкой |
-| Логика статуса | `Store.VerifyLookup` — `internal/dag/store.go` |
-
-Кратко:
-
-- По `document_id` ищется **последняя по времени** (с учётом tie-break) транзакция среди **issue** и **revoke** в памяти после загрузки.
-- Если последняя — **revoke** → статус «отозван», не ок для «действующего» документа.
-- Если последняя — **issue** → сравниваются хэши содержимого и метаданных с переданными в запросе (после `applyDocumentAndMetaHashes`).
-
----
-
-## 10. Полная проверка цепочки (`/api/validate`)
-
-| Этап | Где в коде |
-|------|------------|
-| HTTP GET | `internal/api/server.go` — `handleValidate` |
-| Перезагрузка с диска | `ReloadChainFromDisk` |
-| Проверки | `Store.ValidateAll` — `internal/dag/store.go` |
-
-Порядок проверок в `ValidateAll` (упрощённо):
-
-1. **Для каждого узла:** ECDSA подпись (`VerifyTransaction`) → код `bad_signature`, если не сходится.
-2. **Целостность ссылок:** каждый `parent_id` существует; вычисление ожидаемого `ComputeNodeHash`; сравнение с `node_hash` → `missing_parent`, `hash_error`, `node_hash_mismatch`.
-3. **Семантика revoke:** для каждого revoke есть соответствующий issue по `document_id`; эмитент revoke совпадает с эмитентом выпуска → иначе `revoke_no_issue`, `illegal_revoke`.
-4. **Предупреждения:** если по `document_id` есть issue и более поздний revoke → предупреждение `document_revoked` (не ошибка целостности журнала).
-
-Итог агрегируется в `ValidationResult` (`summary_ru`, `errors`, `warnings`, счётчики). Тексты на русском формируются функциями `validationSummaryRU`, `integrityOverviewLines` в том же файле `store.go`.
-
-Запись в операционный лог: `OpLogInfo` после validate — попадает в `logs.json`.
-
----
-
-## 11. Прочие API (кратко)
-
-| Маршрут | Назначение | Файл |
-|---------|------------|------|
-| `/api/config` | Типы, эмитенты, органы для UI | `server.go` |
-| `/api/documents` | Список из `documents.json` | `server.go` |
-| `/api/dag` | Снимок узлов для визуализации | `handleDAG` |
-| `/api/gossip` | События и голоса из Store | обработчик gossip |
-| `/api/logs` | Операционный лог | `handleLogs` |
-| `/api/merkle/proof/...` | Упрощённое Merkle-доказательство по множеству транзакций (демо) | `handleMerkleProof` |
-| `/api/attacks/*` | Симуляции атак в памяти с откатом | `server.go` + методы `Attack*` в `internal/dag/store.go` |
-
-Веб-интерфейс: статические файлы `web/index.html`, `web/js/app.js`, `web/css/style.css`.
-
----
-
-## 12. Поток данных при типичном запросе issue
+Файл **`internal/dag/store.go`**, **`appendTransactionLocked`**:
 
 ```text
-Клиент POST /api/tx/issue
-    → server.go: JSON → хэши payload
-    → DocumentTransaction + AddIssue
-    → appendTransactionLocked: SignTransaction, ComputeNodeHash, gossip, persistGraph
-    → nodes.json обновлён на диске
-    → UpsertDocument → documents.json
+s.keys.SignTransaction(tx)
 ```
 
+Реализация **`SignTransaction`** — **`internal/crypto/keys.go`**:
+
+1. **`CanonicalJSONWithoutSig(tx)`** → байты **`body`**.
+2. **`Sign(tx.IssuerCountry, body)`**:
+   - **`h := sha256.Sum256(body)`** — первый SHA-256 от тела (см. раздел 3);
+   - **`ecdsa.SignASN1(rand.Reader, priv, h[:])`** — подпись ASN.1 DER;
+   - результат кодируется в **hex**-строку.
+3. Строка записывается в **`tx.IssuerSignature`**.
+
+Имеется в виду: подпись создаётся **ключом страны из поля `IssuerCountry`** транзакции.
+
+### 2.4. Проверка подписи при валидации цепочки
+
+Файл **`internal/dag/store.go`**, **`ValidateAll`** (цикл по всем узлам):
+
+```text
+s.keys.VerifyTransaction(&n.Transaction)
+```
+
+Реализация **`VerifyTransaction`** — **`internal/crypto/keys.go`**:
+
+1. Снова **`CanonicalJSONWithoutSig(tx)`** → **`body`**.
+2. **`h := sha256.Sum256(body)`** (тот же хэш, что при подписании).
+3. Публичный ключ берётся по **`tx.IssuerCountry`**.
+4. **`ecdsa.VerifyASN1(pub, h[:], sig)`** после декодирования **`IssuerSignature`** из hex.
+
+При несоответствии в результат валидации попадает код **`bad_signature`**.
+
 ---
 
-## 13. Зависимости между пакетами (обзор)
+## 3. SHA-256 и связанные операции: где и для чего
 
-- `cmd/bbsi` → `api`, `dag`, `db`, `crypto`
-- `internal/api` → `dag`, `db`, `model`, `crypto`
-- `internal/dag` → `consensus`, `crypto`, `db`, `model`
-- `internal/consensus` — автономный пакет структур и логики порядка
-- `internal/model` — типы транзакций и константы стран/действий
-- `internal/db` — только файловый JSON и модели файлов
+Ниже все функции лежат в пакете **`internal/crypto`**, если не указано иное.
+
+### 3.1. `SHA256Hex(data []byte)`
+
+Файл **`internal/crypto/hash.go`**.
+
+Использование: **`sha256.Sum256(data)`**, результат в hex. Это базовый примитив для:
+
+- финального **`node_hash`** (строка-сборка → байты → **`SHA256Hex`**),
+- листьев и пар в **`MerkleRoot`**,
+- хэша канонического JSON транзакции (**`ContentHash`**),
+- хэша канонических payload’ов документа/метаданных (**`HashCanonicalJSON`**).
+
+### 3.2. Хэш «содержимого транзакции» для узла (`ContentHash`)
+
+Файл **`internal/crypto/canonical.go`**, функция **`ContentHash(tx)`**:
+
+```text
+CanonicalJSONWithoutSig(tx) → байты → SHA256Hex → строка content hash
+```
+
+Эта строка входит в формулу **`ComputeNodeHash`** (раздел 4).
+
+Важно: это **отдельный** объект от подписи: подпись также использует **`CanonicalJSONWithoutSig`**, но дальше для ECDSA берётся **`sha256.Sum256(body)`** (байтовый хэш), а **`ContentHash`** — это **ещё один** SHA-256 от тех же байтов, уже представленный как **hex-строка** для включения в строку **`payload`** узла.
+
+### 3.3. Хэши документа и метаданных из JSON (API issue)
+
+Файл **`internal/crypto/jsoncanon.go`**:
+
+- **`canonicalizeJSON`** — рекурсивная сортировка ключей в объектах;
+- **`CanonicalJSONFromPayload`** — сериализация без лишнего экранирования;
+- **`HashCanonicalJSON(raw)`** — разбор JSON → канонизация → **`SHA256Hex`**.
+
+Вызывается из **`internal/api/server.go`**, функция **`applyDocumentAndMetaHashes`**, когда клиент передаёт **`document_payload`** / **`metadata_payload`** или сверяет явные хэши с payload.
+
+Итог попадает в поля **`DocumentHash`** и **`MetadataHash`** структуры **`model.DocumentTransaction`** (**`internal/model/types.go`**).
+
+### 3.4. Merkle по родительским `node_hash`
+
+Файл **`internal/crypto/hash.go`**:
+
+- **`MerkleRoot(leaves []string)`** — листья — hex-строки **`node_hash`** родителей; список копируется и **сортируется**; уровни склеиваются через **`SHA256Pair`** (лексикографический порядок пары фиксируется в коде).
+- Пустой список листьев даёт константный хэш от строки **`"empty"`**.
+
+### 3.5. SHA-256 внутри ECDSA (подпись)
+
+Файл **`internal/crypto/keys.go`**, методы **`Sign`** и **`VerifyTransaction`**: перед **`SignASN1`** / **`VerifyASN1`** используется **`sha256.Sum256`** от байтов канонического тела (см. раздел 2).
 
 ---
 
-## 14. Ограничения и замечания для читателя кода
+## 4. Как строится хэшчейн и структура узла
 
-- Один процесс — нет репликации и сетевого консенсуса между узлами.
-- Подписант транзакции определяется полем **`issuer_country`**; для revoke это должен быть эмитент оригинального issue (проверка в `AddRevoke`).
-- Содержимое документа в открытом виде в DAG не хранится — только хэши и метаданные для подписи.
-- Изменение `nodes.json` на диске при работающем сервере до перезагрузки или до вызова endpoints с `ReloadChainFromDisk` может не совпадать с памятью — для validate/verify lookup реализована перезагрузка с диска.
+### 4.1. Структура узла на диске и в памяти
 
-Этого достаточно, чтобы пройтись по репозиторию от хранения до конкретных функций проверки и выдачи.
+Тип **`DAGNode`** — **`internal/dag/node.go`**:
+
+| Поле | JSON | Смысл |
+|------|------|--------|
+| **`Transaction`** | `transaction` | Одна **`DocumentTransaction`** — см. **`internal/model/types.go`**: `tx_id`, `document_id`, типы, хэши содержимого/метаданных, страны, `action`, `timestamp`, **`issuer_signature`**. |
+| **`ParentIDs`** | `parent_ids` | Массив **`tx_id`** родительских узлов (рёбра DAG «новый узел → родители»). |
+| **`NodeHash`** | `node_hash` | Агрегирующий хэш узла; связывает транзакцию с родителями. |
+
+Граф в памяти: **`Store.nodes`** — **`map[string]*DAGNode`** по ключу **`tx_id`** (**`internal/dag/store.go`**).
+
+### 4.2. Формула `node_hash`
+
+Функция **`ComputeNodeHash`** — **`internal/dag/node.go`**:
+
+1. **`ch := ContentHash(tx)`** — SHA-256 канонического JSON транзакции (hex).
+2. Для каждого **`parent_id`** из **`parentIDs`** из карты **`parentNodeHashes`** берётся **`node_hash`** родителя (не транзакционный хэш напрямую). Если родитель не найден — ошибка.
+3. **`mr := MerkleRoot(leaves)`** — корень по списку **`node_hash`** родителей в порядке **`parentIDs`**.
+4. Строка **`payload`** (UTF-8):
+
+   **`fmt.Sprintf("%s|%s|%s|%d", tx.TxID, ch, mr, tx.Timestamp)`**
+
+5. **`node_hash = SHA256Hex([]byte(payload))`**.
+
+Так новый узел криптографически зависит от содержимого своей транзакции и от **`node_hash`** всех указанных родителей.
+
+### 4.3. Построение цепочки при добавлении транзакции
+
+Вся логика в **`internal/dag/store.go`**, функция **`appendTransactionLocked`** (публичный вход **`appendTransaction`** добавляет **`persistGraph`**).
+
+Пошагово:
+
+1. **Уникальность** `tx_id`; если пустой — **`randomTxId`** в этом же файле.
+2. **`timestamp`** по умолчанию — текущее время Unix (секунды).
+3. **`action`** только **`issue`** или **`revoke`** (иначе ошибка).
+4. Валидация родителей: каждый **`parent_id`** должен существовать в **`s.nodes`**.
+5. Если **`parent_ids` пустой** и граф **не пуст** — подстановка **tips** (**`tipsLocked`**): все узлы, которые никто не указывает как родителя (активные «головы» DAG).
+6. Карта **`ph`**: для каждого родителя **`ph[pid] = s.nodes[pid].NodeHash`**.
+7. **`SignTransaction`** → заполнение **`IssuerSignature`**.
+8. **`ComputeNodeHash(tx, parentIDs, ph)`** → **`NodeHash`**.
+9. Узел добавляется в **`s.nodes`**.
+10. Вызов **gossip** и **`RunVirtualVote`** (раздел 1).
+11. Снаружи под блокировкой **`appendTransaction`** вызывается **`persistGraph`** — запись **`nodes.json`**.
+
+Первый узел в пустом графе: родителей нет → **`MerkleRoot`** от пустого списка даёт хэш **`"empty"`**.
+
+---
+
+## 5. Операции «выдача» и «отзыв»: полный разбор по шагам и файлам
+
+Обе операции в журнал сводятся к **`appendTransaction`** после специфических проверок и формирования **`DocumentTransaction`** на HTTP-слое или в **`Store`**.
+
+### 5.1. Выдача документа (**issue**)
+
+#### Шаг A — HTTP и разбор тела запроса
+
+| Шаг | Файл | Функция / место |
+|-----|------|------------------|
+| Маршрут POST | **`internal/api/server.go`** | **`Routes`**: **`/api/tx/issue`** → **`handleIssue`**. |
+| Разбор JSON | **`internal/api/server.go`** | Тип **`issueReq`** (поля `document_id`, `document_type`, хэши, payload’ы, страны, **`parent_ids`**). |
+
+#### Шаг B — хэши содержимого и метаданных
+
+| Шаг | Файл | Функция |
+|-----|------|---------|
+| Вычисление/проверка `document_hash`, `metadata_hash` | **`internal/api/server.go`** | **`applyDocumentAndMetaHashes`** — при наличии payload вызывает **`chaincrypto.HashCanonicalJSON`** (**`internal/crypto/jsoncanon.go`**). |
+
+#### Шаг C — сборка транзакции
+
+| Шаг | Файл | Что происходит |
+|-----|------|----------------|
+| Установка полей | **`internal/api/server.go`** | **`handleIssue`**: создаётся **`model.DocumentTransaction`** с **`ActionIssue`**, **`DocumentHash`**, **`MetadataHash`**, странами и типом; если тип пуст — **`model.DocDiploma`** (**`internal/model/types.go`**). |
+
+#### Шаг D — запись в DAG
+
+| Шаг | Файл | Функция |
+|-----|------|---------|
+| Вызов журнала | **`internal/api/server.go`** | **`s.Store.AddIssue(tx, req.ParentIDs)`**. |
+| Проверка `action` | **`internal/dag/store.go`** | **`AddIssue`** требует **`model.ActionIssue`**. |
+| Общий конвейер | **`internal/dag/store.go`** | **`appendTransaction`** → **`appendTransactionLocked`** (подпись, **`ComputeNodeHash`**, gossip, голосование, **`persistGraph`**). |
+
+#### Шаг E — реестр для UI (не источник крипто-истины цепочки)
+
+| Шаг | Файл | Функция |
+|-----|------|---------|
+| Обновление **`documents.json`** | **`internal/api/server.go`** | После успеха: **`db.UpsertDocument`** (**`internal/db/documents.go`**) — payload’ы, хэши, **`LastTxID`**, **`LastAction: issue`**. |
+
+#### Шаг F — ответ клиенту
+
+JSON с ключом **`node`** — сериализованный **`DAGNode`** (узел с **`transaction`**, **`parent_ids`**, **`node_hash`**).
+
+---
+
+### 5.2. Отзыв документа (**revoke**)
+
+#### Шаг A — HTTP
+
+| Шаг | Файл | Функция |
+|-----|------|---------|
+| Маршрут POST | **`internal/api/server.go`** | **`/api/tx/revoke`** → **`handleRevoke`**. |
+
+#### Шаг B — формирование транзакции на сервере
+
+| Шаг | Файл | Что происходит |
+|-----|------|----------------|
+| Тело запроса | **`internal/api/server.go`** | Тип **`revokeReq`**: **`document_id`**, **`issuer_country`**, **`parent_ids`**. |
+| Сборка **`DocumentTransaction`** | **`internal/api/server.go`** | **`handleRevoke`**: **`ActionRevoke`**, **`IssuerCountry`** из запроса, **`IssuerAuthority`** фиксирован как строка **`Revocation`**, **`ReceiverCountry`** из **`model.CountryBY`**, **`MetadataHash`** от байтов **`"revoke"`** через **`chaincrypto.SHA256Hex`**, тип документа по умолчанию диплом и т.д. |
+
+То есть для revoke часть полей задаётся **не клиентскими payload’ами документа**, а шаблоном в **`handleRevoke`**.
+
+#### Шаг C — бизнес-правило «кто может отозвать»
+
+| Шаг | Файл | Функция |
+|-----|------|---------|
+| Проверка до подписи | **`internal/dag/store.go`** | **`AddRevoke`** вызывает **`findIssuerForDoc(document_id)`** под **`RLock`**. |
+| Поиск эмитента выпуска | **`internal/dag/store.go`** | **`findIssuerForDoc`**: среди узлов с **`document_id`** и **`action == issue`** выбирается выпуск с **минимальным `timestamp`** (ранний **`issue`** как эталон эмитента). |
+| Сравнение | **`internal/dag/store.go`** | Если **`tx.IssuerCountry != issuer`** — ошибка **`отзыв может выполнить только эмитент …`**; узел **не** добавляется. |
+
+Если проверка прошла — вызывается **`appendTransaction`** → тот же конвейер, что у issue: подпись ключом **`IssuerCountry`** транзакции revoke, **`node_hash`**, gossip, голосование, **`persistGraph`**.
+
+#### Шаг D — реестр
+
+| Шаг | Файл | Функция |
+|-----|------|---------|
+| Последнее действие | **`internal/api/server.go`** | **`db.UpsertDocumentLastAction`** (**`internal/db/documents.go`**) — **`LastTxID`**, **`LastAction: revoke`**. |
+
+#### Шаг E — семантика в журнале
+
+Узел **issue не удаляется**. В графе появляется **ещё один** узел **`revoke`** с тем же **`document_id`**. Связь с прошлым состоянием задаётся **`parent_ids`** (часто автоматически tips, если клиент передал пустой список).
+
+Полная проверка журнала (**`/api/validate`**) дополнительно проверяет каждый revoke (**`ValidateAll`** в **`internal/dag/store.go`**): наличие issue по документу и совпадение эмитента (**`findIssuerLocked`** / коды **`revoke_no_issue`**, **`illegal_revoke`**). Отдельно формируются предупреждения **`document_revoked`**, если revoke не старше соответствующего issue — это про «действительность документа», не про поломку цепочки.
+
+---
+
+## Краткая карта файлов
+
+| Тема | Основные файлы |
+|------|----------------|
+| DAG, добавление узла, валидация, issue/revoke на стороне журнала | **`internal/dag/store.go`**, **`internal/dag/node.go`** |
+| Сохранение графа, **`nodes.json`**, миграция legacy verify | **`internal/dag/persistence.go`** |
+| Консенсус-подобное упорядочивание и gossip | **`internal/consensus/gossip.go`** |
+| ECDSA, канонизация транзакции для подписи и **`ContentHash`** | **`internal/crypto/keys.go`**, **`internal/crypto/canonical.go`** |
+| SHA-256, Merkle | **`internal/crypto/hash.go`** |
+| Хэши JSON payload’ов (issue в API) | **`internal/crypto/jsoncanon.go`** |
+| HTTP issue/revoke | **`internal/api/server.go`** |
+| Модель транзакции | **`internal/model/types.go`** |
+| Файлы БД и имена JSON | **`internal/db/db.go`** |
+| Ключи эмитентов на диске | **`internal/crypto/persist.go`** → **`authority_keys.json`** |
+
+Этого достаточно, чтобы пройти любой шаг «хэшчейна» от HTTP до байтов на диске по конкретным функциям.
